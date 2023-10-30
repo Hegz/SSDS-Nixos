@@ -104,7 +104,7 @@ in
   };
   users.users.otto = {
     isNormalUser = true;
-    openssh.authorizedKeys.keyFiles = [
+    openssh.authorizedKeys.keys = [
       "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAwaF65IvEZtjv5zCxQlCsJ5ThymSwXocfxk3uBaDlFLZXdqVw+KFb83GNwj1UDYsPCEz2RwXjs8XHxrIS72Npm+OKhlR/adbY6Q+Gtx+bM+PDKlHxOzNgYkIVHV0B8RHLVmTMjLwwOXayiolR8WuljvLjLcvRLkx1WgQgwdCuvQvCV99Gfyn9uUH7wcf    dPd/SlRqPJ6k6h0J1Z/E+FlBJADxNObwlXpyhAVhlKdepT9Wo62rQfDfXDXawSRjUfDVHZkBnx7c9FH1eralLF8ILjXv1zR7It7juOgW2dtvvLWL15UKClWNfK15EWq/lp0vtR1rzueL9FtoyqKP98YBvlQ== sys-automation@server"
     ];
     packages = with pkgs; [
