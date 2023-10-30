@@ -11,13 +11,15 @@ let
   }; 
   # Raspberry pi harware overlays
   nixos-hardware = builtins.fetchTarball {
-    url = "https://github.com/NixOS/nixos-hardware/archive/master.tar.gz";
+    url = "https://github.com/NixOS/nixos-hardware/archive/80d98a7d55c6e27954a166cb583a41325e9512d7.zip";
     sha256 = "sha256:10017wi78lk746m16ca76dbywdzq495f65vxmav012slipzh7zxh";
+    # Pinned to release date 23/Oct/2023
   }; 
   # Sops secret management
   sops-nix = builtins.fetchTarball {
-    url = "https://github.com/Mic92/sops-nix/archive/master.tar.gz";
-    sha256 = "sha256:1naan67qfc2djqnqrvpnh4l14m1lplkyxwdbmmkm4j94yy1jl2xk";
+    url = "https://github.com/Mic92/sops-nix/archive/632c3161a6cc24142c8e3f5529f5d81042571165.zip";
+    sha256 = "sha256:0lbw6ci3z2ciqnfszk942c3w8drn7qbnhha1bc1praj660x3gkgd";
+    # Pinned to release date 28/Oct/2023
   }; 
 in
 {
