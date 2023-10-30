@@ -36,7 +36,6 @@ in
   sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
   sops.secrets.dbert-pass.neededForUsers = true;
   sops.secrets.wifi = {};
-  sops.secrets.ssh_key = {}; #.neededForUsers = true;
   sops.secrets.wayvnc_cfg = {
     owner = config.users.users.otto.name;
     path = "/home/otto/.config/wayvnc/wayvnc";
