@@ -194,6 +194,7 @@ in
     htop
     libraspberrypi
     raspberrypi-eeprom
+    killall
   ];
   
   # CEC related configuration
