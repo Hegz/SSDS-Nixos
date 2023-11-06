@@ -155,7 +155,7 @@ in
       # Link VNC config into place
       generate_keys = lib.hm.dag.entryAfter ["writeBoundary"] ''
         $DRY_RUN_CMD ${pkgs.openssl}/bin/openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout /home/otto/.config/wayvnc/tls_key.pem -out /home/otto/.config/wayvnc/tls_cert.pem -subj /CN=localhost
-        $DRY_RUN_CMD ln -s ${config.sops.secrets.wayvnc_cfg.path} /home/otto/.config/wayvnc/wayvnc;
+        $DRY_RUN_CMD ln -sf ${config.sops.secrets.wayvnc_cfg.path} /home/otto/.config/wayvnc/wayvnc;
       '';
     };
     # Open office has a memory leak.  refresh it dailiy at 6:00am
