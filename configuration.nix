@@ -38,7 +38,6 @@ in
   sops.secrets.wifi = {};
   sops.secrets.wayvnc_cfg = {
     owner = config.users.users.otto.name;
-    path = "/home/otto/.config/wayvnc/wayvnc";
   };
   
   boot = {
@@ -145,15 +144,18 @@ in
         $DRY_RUN_CMD mkdir -p /home/otto/Control;
         $DRY_RUN_CMD mkdir -p /home/otto/Presentation;
       '';
-      # Generate the libreoffice .config files, then link in the macros
+      # Generate the libreoffice .config files / directories, then link in the macros
       libreofficesetup = lib.hm.dag.entryAfter ["writeBoundary"] ''
-        $DRY_RUN_CMD /etc/profiles/per-user/otto/bin/libreoffice --terminate_after_init --headless;
+        $DRY_RUN_CMD rm -rf /home/otto/.config/libreoffice/;
+        $DRY_RUN_CMD ${pkgs.libreoffice}/bin/libreoffice --terminate_after_init --headless;
         $DRY_RUN_CMD rm -rf /home/otto/.config/libreoffice/4/user/basic/Standard;
         $DRY_RUN_CMD ln -s /home/otto/ssds/Standard /home/otto/.config/libreoffice/4/user/basic/;
       '';
       # Generate RSA key for VNC
+      # Link VNC config into place
       generate_keys = lib.hm.dag.entryAfter ["writeBoundary"] ''
-        $DRY_RUN_CMD /etc/profiles/per-user/otto/bin/openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout /home/otto/.config/wayvnc/tls_key.pem -out /home/otto/.config/wayvnc/tls_cert.pem -subj /CN=localhost
+        $DRY_RUN_CMD ${pkgs.openssl}/bin/openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout /home/otto/.config/wayvnc/tls_key.pem -out /home/otto/.config/wayvnc/tls_cert.pem -subj /CN=localhost
+        $DRY_RUN_CMD ln -s ${config.sops.secrets.wayvnc_cfg.path} /home/otto/.config/wayvnc/wayvnc;
       '';
     };
     # Open office has a memory leak.  refresh it dailiy at 6:00am
