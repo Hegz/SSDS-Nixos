@@ -118,18 +118,6 @@ in
     ];
   };
 
-  systemd.user.services.sway = {
-    enable = true;
-    description = "Sway window manager";
-    after = [ "default.target" ];
-    wantedBy = [ "default.target" ];
-    # serviceConfig.ExecStart = "WLR_LIBINPUT_NO_DEVICES=1 ${pkgs.sway}/bin/sway";
-    serviceConfig.ExecStart = toString ( pkgs.writeShellScript "launch_sway.sh" ''
-        WLR_LIBINPUT_NO_DEVICES=1
-        ${pkgs.sway}/bin/sway
-      '');
-  };
-
   home-manager.users.otto = { pkgs, lib, ... }: {
     # Enable sway managment, and set options
     wayland.windowManager.sway.enable = true;
@@ -169,20 +157,41 @@ in
         $DRY_RUN_CMD ln -sf ${config.sops.secrets.wayvnc_cfg.path} /home/otto/.config/wayvnc/wayvnc;
       '';
     };
-    # Open office has a memory leak.  refresh it dailiy at 6:00am
+
+#  systemd.user.services.sway = {
+#    enable = true;
+#    description = "Sway window manager";
+#    after = [ "default.target" ];
+#    wantedBy = [ "default.target" ];
+#    # serviceConfig.ExecStart = "WLR_LIBINPUT_NO_DEVICES=1 ${pkgs.sway}/bin/sway";
+#    servieConfig.ExecStart = toString ( pkgs.writeShellScript "launch_sway.sh" ''
+#        WLR_LIBINPUT_NO_DEVICES=1
+#        ${pkgs.sway}/bin/sway
+#      '');
+#  };
+
+
     systemd.user.services = {
-      office_refresh = {
-        Unit = {
-          Description = "Office Refresh";
-        };
+      sway = {
+        Unit.Description = "Start sway window manager";
         Service = {
           Type = "oneshot";
-          ExecStart = toString (
-            pkgs.writeShellScript "soffice_refresh.sh" ''
-              ${pkgs.killall}/bin/killall soffice.bin
-            '');
+          ExecStart = toString ( pkgs.writeShellScript "launch_sway.sh" ''
+            WLR_LIBINPUT_NO_DEVICES=1
+            ${pkgs.sway}/bin/sway
+          '');
         };
-        #Install.WantedBy = [ "default.target" ];
+      };
+          
+      # Open office has a memory leak.  refresh it dailiy at 6:00am
+      office_refresh = {
+        Unit.Description = "Nightly Libreoffice Refresh";
+        Service = {
+          Type = "oneshot";
+          ExecStart = toString ( pkgs.writeShellScript "soffice_refresh.sh" ''
+            ${pkgs.killall}/bin/killall soffice.bin
+          '');
+        };
       };
     };
     systemd.user.timers = {
