@@ -122,10 +122,6 @@ in
     # Enable sway managment, and set options
     wayland.windowManager.sway.enable = true;
     wayland.windowManager.sway.config = {
-    #  startup = [ 
-    #    { command = "exec ${pkgs.wayvnc}/bin/wayvnc"; always=true; }
-    #    { command = "exec /home/otto/ssds/wrapper.sh"; always=true; }
-    #  ];
       seat = { "*" = { hide_cursor = "600"; }; };
       output = { "*" = { bg ="~/ssds/School_District_73.jpg fill"; }; };
     };
@@ -159,24 +155,10 @@ in
         $DRY_RUN_CMD ln -sf ${config.sops.secrets.wayvnc_cfg.path} /home/otto/.config/wayvnc/wayvnc;
       '';
     };
-
-#  systemd.user.services.sway = {
-#    enable = true;
-#    description = "Sway window manager";
-#    after = [ "default.target" ];
-#    wantedBy = [ "default.target" ];
-#    # serviceConfig.ExecStart = "WLR_LIBINPUT_NO_DEVICES=1 ${pkgs.sway}/bin/sway";
-#    servieConfig.ExecStart = toString ( pkgs.writeShellScript "launch_sway.sh" ''
-#        WLR_LIBINPUT_NO_DEVICES=1
-#        ${pkgs.sway}/bin/sway
-#      '');
-#  };
-
     systemd.user.services = {
       wayvnc = {
         Unit.Description = "Wayvnc screen sharing";
         Service = {
-          #Type = "oneshot";
           ExecStart = toString ( pkgs.writeShellScript "launch_wayvnc.sh" ''
             ${pkgs.wayvnc}/bin/wayvnc -v --config=${config.sops.secrets.wayvnc_cfg.path}
           '');
@@ -186,7 +168,16 @@ in
           After = ["sway-session.target"];
         };
       };
-          
+      ssds = {
+        Unit.Description = "Super Simple Digital Signage";
+        Service = {
+          ExecStart = "/home/otto/ssds/wrapper.sh";
+        };
+        Install = { 
+          WantedBy = ["default.target"];
+          After = ["sway-session.target"];
+        };
+      };
       # Open office has a memory leak.  refresh it dailiy at 6:00am
       office_refresh = {
         Unit.Description = "Nightly Libreoffice Refresh";
