@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+git pull
+
 echo Linking configuration files in to place
 sudo rm /etc/nixos/configuration.nix
 sudo ln -s $(pwd)/configuration.nix /etc/nixos/configuration.nix
