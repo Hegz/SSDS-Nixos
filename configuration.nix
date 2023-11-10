@@ -170,7 +170,6 @@ in
 #      '');
 #  };
 
-
     systemd.user.services = {
       sway = {
         Unit.Description = "Start sway window manager";
@@ -181,6 +180,7 @@ in
             ${pkgs.sway}/bin/sway
           '');
         };
+        Install.Wantedby = ["Default.target"];
       };
           
       # Open office has a memory leak.  refresh it dailiy at 6:00am
