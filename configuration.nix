@@ -195,7 +195,7 @@ in
               WLR_LIBINPUT_NO_DEVICES=1 
               ${pkgs.sway}/bin/sway
             '');
-        }
+        };
       };
     };
     systemd.user.timers = {
