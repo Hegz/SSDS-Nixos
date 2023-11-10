@@ -173,18 +173,19 @@ in
 #  };
 
     systemd.user.services = {
-#      sway = {
-#        Unit.Description = "Start sway window manager";
-#        Service = {
-#          #Type = "oneshot";
-#          ExecStart = toString ( pkgs.writeShellScript "launch_sway.sh" ''
-#            WLR_LIBINPUT_NO_DEVICES=1
-#            ${pkgs.sway}/bin/sway
-#          '');
-#        };
-#        Install.WantedBy = ["default.target"];
-#      };
-#          
+      wayvnc = {
+        Unit.Description = "Wayvnc screen sharing";
+        Service = {
+          #Type = "oneshot";
+          ExecStart = toString ( pkgs.writeShellScript "launch_wayvnc.sh" ''
+            ${pkgs.wayvnc}/bin/wayvnc --config=/home/otto/.config/wayvnc/wayvnc
+          '');
+        };
+        Install = { 
+          WantedBy = ["default.target"];
+          After = ["sway-session.target"];
+      };
+          
       # Open office has a memory leak.  refresh it dailiy at 6:00am
       office_refresh = {
         Unit.Description = "Nightly Libreoffice Refresh";
