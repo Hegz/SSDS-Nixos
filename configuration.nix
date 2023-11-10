@@ -180,7 +180,7 @@ in
             ${pkgs.sway}/bin/sway
           '');
         };
-        Install.Wantedby = ["Default.target"];
+        Install.WantedBy = ["default.target"];
       };
           
       # Open office has a memory leak.  refresh it dailiy at 6:00am
