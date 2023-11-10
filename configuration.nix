@@ -123,7 +123,11 @@ in
     description = "Sway window manager";
     after = [ "default.target" ];
     wantedBy = [ "default.target" ];
-    serviceConfig.ExecStart = "WLR_LIBINPUT_NO_DEVICES=1 ${pkgs.sway}/bin/sway";
+    # serviceConfig.ExecStart = "WLR_LIBINPUT_NO_DEVICES=1 ${pkgs.sway}/bin/sway";
+    serviceConfig.ExecStart = toString ( pkgs.writeShellScript "launch_sway.sh" ''
+        WLR_LIBINPUT_NO_DEVICES=1
+        ${pkgs.sway}/bin/sway
+      '');
   };
 
   home-manager.users.otto = { pkgs, lib, ... }: {
