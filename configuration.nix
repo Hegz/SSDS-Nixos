@@ -172,7 +172,7 @@ in
 #      '');
 #  };
 
-#    systemd.user.services = {
+    systemd.user.services = {
 #      sway = {
 #        Unit.Description = "Start sway window manager";
 #        Service = {
