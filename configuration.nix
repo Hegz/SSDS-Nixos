@@ -157,6 +157,18 @@ in
         $DRY_RUN_CMD ln -sf ${config.sops.secrets.wayvnc_cfg.path} /home/otto/.config/wayvnc/wayvnc;
       '';
     };
+
+
+  systemd.user.services.sway = {
+    enable = true;
+    description = "Sway window manager";
+    after = [ "default.target" ];
+    wantedBy = [ "default.target" ];
+    serviceConfig.ExecStart = "WLR_LIBINPUT_NO_DEVICES=1 ${pkgs.sway}/bin/sway";
+  };
+
+
+    
     # Open office has a memory leak.  refresh it dailiy at 6:00am
     systemd.user.services = {
       office_refresh = {
@@ -171,7 +183,6 @@ in
         };
         #Install.WantedBy = [ "default.target" ];
       };
-      # Start the sway desktop manager
       sway = {
         enable = true;
         description = "Sway window manager";
