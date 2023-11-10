@@ -48,7 +48,7 @@ in
       generic-extlinux-compatible.enable = true;
       raspberryPi.firmwareConfig = ''gpu_mem=192'';
     };
-    plymouth.enable = true;
+    plymouth.enable = false;
   };
 
   networking = {
