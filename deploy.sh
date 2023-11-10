@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 git pull
 
 echo Linking configuration files in to place
