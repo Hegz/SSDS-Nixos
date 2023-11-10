@@ -184,6 +184,7 @@ in
         Install = { 
           WantedBy = ["default.target"];
           After = ["sway-session.target"];
+        };
       };
           
       # Open office has a memory leak.  refresh it dailiy at 6:00am
