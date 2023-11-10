@@ -53,6 +53,25 @@ in
 
   networking = {
     hostName = "nixos-ssds"; # Define your hostname.
+    networkmanager = {
+      enabled = true;
+      dispatcherScripts = [ {
+		source = pkgs.writeText "upHook" ''
+          if [ "$1" == "end0" ] then
+			if [ "$2" = "up" ]; then
+				logger "end0 online, disabling wlan0"
+                ip link set wlan0 down
+				exit
+            else
+				logger "end0 offline, enabling wlan0"
+                ip link set wlan0 up
+				exit
+			fi
+          fi
+	    '';
+	    type = "basic";
+      }]
+    };
     wireless = {
       environmentFile = config.sops.secrets."wifi".path;
       enable = true;  # Enables wireless support via wpa_supplicant.
