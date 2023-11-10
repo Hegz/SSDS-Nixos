@@ -54,7 +54,7 @@ in
   networking = {
     hostName = "nixos-ssds"; # Define your hostname.
     networkmanager = {
-      enabled = true;
+      enable = true;
       dispatcherScripts = [ {
 		source = pkgs.writeText "upHook" ''
           if [ "$1" == "end0" ] then
