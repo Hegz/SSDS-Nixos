@@ -90,9 +90,9 @@ in
 
   # Enable user autologin and sway startup
   services.getty.autologinUser = "otto";
-#  environment.loginShellInit = ''
-#    [[ "$(tty)" == /dev/tty1 ]] && WLR_LIBINPUT_NO_DEVICES=1 sway
-#    '';
+  environment.loginShellInit = ''
+    [[ "$(tty)" == /dev/tty1 ]] && WLR_LIBINPUT_NO_DEVICES=1 sway
+    '';
 
   # Define a user accounts. 
   users.users.dbert = {
@@ -172,19 +172,19 @@ in
 #      '');
 #  };
 
-    systemd.user.services = {
-      sway = {
-        Unit.Description = "Start sway window manager";
-        Service = {
-          #Type = "oneshot";
-          ExecStart = toString ( pkgs.writeShellScript "launch_sway.sh" ''
-            WLR_LIBINPUT_NO_DEVICES=1
-            ${pkgs.sway}/bin/sway
-          '');
-        };
-        Install.WantedBy = ["default.target"];
-      };
-          
+#    systemd.user.services = {
+#      sway = {
+#        Unit.Description = "Start sway window manager";
+#        Service = {
+#          #Type = "oneshot";
+#          ExecStart = toString ( pkgs.writeShellScript "launch_sway.sh" ''
+#            WLR_LIBINPUT_NO_DEVICES=1
+#            ${pkgs.sway}/bin/sway
+#          '');
+#        };
+#        Install.WantedBy = ["default.target"];
+#      };
+#          
       # Open office has a memory leak.  refresh it dailiy at 6:00am
       office_refresh = {
         Unit.Description = "Nightly Libreoffice Refresh";
