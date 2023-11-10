@@ -70,7 +70,7 @@ in
           fi
 	    '';
 	    type = "basic";
-      }]
+      }];
     };
     wireless = {
       environmentFile = config.sops.secrets."wifi".path;
