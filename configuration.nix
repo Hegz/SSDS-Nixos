@@ -178,7 +178,7 @@ in
         Service = {
           #Type = "oneshot";
           ExecStart = toString ( pkgs.writeShellScript "launch_wayvnc.sh" ''
-            ${pkgs.wayvnc}/bin/wayvnc --config=/home/otto/.config/wayvnc/wayvnc
+            ${pkgs.wayvnc}/bin/wayvnc -v --config=${config.sops.secrets.wayvnc_cfg.path}
           '');
         };
         Install = { 
