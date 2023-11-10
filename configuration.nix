@@ -90,9 +90,9 @@ in
 
   # Enable user autologin and sway startup
   services.getty.autologinUser = "otto";
-#  environment.loginShellInit = ''
-#    [[ "$(tty)" == /dev/tty1 ]] && WLR_LIBINPUT_NO_DEVICES=1 sway
-#    '';
+  environment.loginShellInit = ''
+    [[ "$(tty)" == /dev/tty1 ]] && WLR_LIBINPUT_NO_DEVICES=1 sway
+    '';
 
   # Define a user accounts. 
   users.users.dbert = {
@@ -122,10 +122,10 @@ in
     # Enable sway managment, and set options
     wayland.windowManager.sway.enable = true;
     wayland.windowManager.sway.config = {
-    #  startup = [ 
-    #    { command = "exec ${pkgs.wayvnc}/bin/wayvnc"; always=true; }
-    #    { command = "exec /home/otto/ssds/wrapper.sh"; always=true; }
-    #  ];
+      startup = [ 
+        { command = "exec ${pkgs.wayvnc}/bin/wayvnc"; always=true; }
+        { command = "exec /home/otto/ssds/wrapper.sh"; always=true; }
+      ];
       seat = { "*" = { hide_cursor = "600"; }; };
       output = { "*" = { bg ="~/ssds/School_District_73.jpg fill"; }; };
     };
