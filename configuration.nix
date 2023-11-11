@@ -173,7 +173,7 @@ in
         Unit.Description = "Super Simple Digital Signage";
         Service = {
           ExecStart = toString ( pkgs.writeShellScript "ssds_wrapper.sh" ''
-             /home/otto/ssds/presentation.sh
+             ${pkgs.bash} /home/otto/ssds/presentation.sh
           '');
           Type="exec";
         };
