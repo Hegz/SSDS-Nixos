@@ -162,6 +162,7 @@ in
           ExecStart = toString ( pkgs.writeShellScript "launch_wayvnc.sh" ''
             ${pkgs.wayvnc}/bin/wayvnc -v --config=${config.sops.secrets.wayvnc_cfg.path}
           '');
+          Type="exec";
         };
         Install = { 
           WantedBy = ["default.target"];
@@ -171,7 +172,10 @@ in
       ssds = {
         Unit.Description = "Super Simple Digital Signage";
         Service = {
-          ExecStart = "/home/otto/ssds/wrapper.sh";
+          ExecStart = toString ( pkgs.writeShellScript "ssds_wrapper.sh" ''
+             /home/otto/ssds/presentation.sh
+          '');
+          Type="exec";
         };
         Install = { 
           WantedBy = ["default.target"];
@@ -182,7 +186,7 @@ in
       office_refresh = {
         Unit.Description = "Nightly Libreoffice Refresh";
         Service = {
-          #Type = "oneshot";
+          Type = "oneshot";
           ExecStart = toString ( pkgs.writeShellScript "soffice_refresh.sh" ''
             ${pkgs.killall}/bin/killall soffice.bin
           '');
