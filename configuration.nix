@@ -172,9 +172,7 @@ in
       ssds = {
         Unit.Description = "Super Simple Digital Signage";
         Service = {
-          ExecStart = toString ( pkgs.writeShellScript "ssds_wrapper.sh" ''
-             ${pkgs.bash} /home/otto/ssds/presentation.sh
-          '');
+          ExecStart = "${pkgs.bash} /home/otto/ssds/presentation.sh";
           Type="exec";
         };
         Install = { 
