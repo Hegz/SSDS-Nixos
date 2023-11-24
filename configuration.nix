@@ -147,15 +147,16 @@ in
       libreofficesetup = lib.hm.dag.entryAfter ["writeBoundary"] ''
         if [ ! -d /home/otto/.config/libreoffice/ ]; then
           $DRY_RUN_CMD ${pkgs.libreoffice}/bin/libreoffice --terminate_after_init --headless;
+          $DRY_RUN_CMD rm -rf /home/otto/.config/libreoffice/4/user/basic/Standard;
+          $DRY_RUN_CMD ln -s /home/otto/ssds/Standard /home/otto/.config/libreoffice/4/user/basic/;
         fi
-        $DRY_RUN_CMD rm -rf /home/otto/.config/libreoffice/4/user/basic/Standard;
-        $DRY_RUN_CMD ln -s /home/otto/ssds/Standard /home/otto/.config/libreoffice/4/user/basic/;
       '';
       # Generate RSA key for VNC
       # Link VNC config into place
       generate_keys = lib.hm.dag.entryAfter ["writeBoundary"] ''
-        $DRY_RUN_CMD ${pkgs.openssl}/bin/openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout /home/otto/.config/wayvnc/tls_key.pem -out /home/otto/.config/wayvnc/tls_cert.pem -subj /CN=localhost
-        $DRY_RUN_CMD ln -sf ${config.sops.secrets.wayvnc_cfg.path} /home/otto/.config/wayvnc/wayvnc;
+        if [ ! -f /home/otto/.config/wayvnc/tls_key.pem ]; then
+          $DRY_RUN_CMD ${pkgs.openssl}/bin/openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout /home/otto/.config/wayvnc/tls_key.pem -out /home/otto/.config/wayvnc/tls_cert.pem -subj /CN=localhost;
+        fi
       '';
     };
     systemd.user.services = {
@@ -179,24 +180,6 @@ in
           After = ["sway-session.target"];
         };
       };
-#      ssds = {
-#        Unit = { 
-#          Description = "Super Simple Digital Signage";
-#          After = ["sway-session.target"];
-#          StartLimitIntervalSec = 500;
-#          StartLimitBurst = 5;
-#        };
-#        Service = {
-#          ExecStart = "${pkgs.bash}/bin/bash /home/otto/ssds/presentation.sh";
-#          Type="exec";
-#          Restart="on-failure";
-#          RestartSec="5s";
-#        };
-#        Install = { 
-#          WantedBy = ["default.target"];
-#          After = ["sway-session.target"];
-#        };
-#      };
       # Open office has a memory leak.  refresh it dailiy at 6:00am
       office_refresh = {
         Unit.Description = "Nightly Libreoffice Refresh";
