@@ -133,7 +133,7 @@ in
       owner = "Hegz";
       repo = "SSDS";
       rev = "9849930005b6984540c9b8a568ccff7ed16a79fc";
-      hash = "";
+      hash = "sha256-loPoViBpDYzYhJTSAAfCnQw3/V6KCncPRcXyCIvUiQA=";
     }}";
 
     home.activation = {
