@@ -124,6 +124,9 @@ in
     wayland.windowManager.sway.config = {
       seat = { "*" = { hide_cursor = "600"; }; };
       output = { "*" = { bg ="~/ssds/School_District_73.jpg fill"; }; };
+      startup = [
+         { command = "exec /home/otto/ssds/wrapper.sh"; always=true; }
+      ];
     };
     # Import the SSDS files from Github.
     home.file."ssds".source = "${pkgs.fetchFromGitHub { 
@@ -176,24 +179,24 @@ in
           After = ["sway-session.target"];
         };
       };
-      ssds = {
-        Unit = { 
-          Description = "Super Simple Digital Signage";
-          After = ["sway-session.target"];
-          StartLimitIntervalSec = 500;
-          StartLimitBurst = 5;
-        };
-        Service = {
-          ExecStart = "${pkgs.bash}/bin/bash /home/otto/ssds/presentation.sh";
-          Type="exec";
-          Restart="on-failure";
-          RestartSec="5s";
-        };
-        Install = { 
-          WantedBy = ["default.target"];
-          After = ["sway-session.target"];
-        };
-      };
+#      ssds = {
+#        Unit = { 
+#          Description = "Super Simple Digital Signage";
+#          After = ["sway-session.target"];
+#          StartLimitIntervalSec = 500;
+#          StartLimitBurst = 5;
+#        };
+#        Service = {
+#          ExecStart = "${pkgs.bash}/bin/bash /home/otto/ssds/presentation.sh";
+#          Type="exec";
+#          Restart="on-failure";
+#          RestartSec="5s";
+#        };
+#        Install = { 
+#          WantedBy = ["default.target"];
+#          After = ["sway-session.target"];
+#        };
+#      };
       # Open office has a memory leak.  refresh it dailiy at 6:00am
       office_refresh = {
         Unit.Description = "Nightly Libreoffice Refresh";
