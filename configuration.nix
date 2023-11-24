@@ -156,13 +156,20 @@ in
       '';
     };
     systemd.user.services = {
-      wayvnc = {
-        Unit.Description = "Wayvnc screen sharing";
+      wayvnc = { 
+        Unit = { 
+          Description = "Wayvnc screen sharing";
+          After = ["sway-session.target"];
+          StartLimitIntervalSec = 500;
+          StartLimitBurst = 5;
+        };
         Service = {
           ExecStart = toString ( pkgs.writeShellScript "launch_wayvnc.sh" ''
             ${pkgs.wayvnc}/bin/wayvnc -v --config=${config.sops.secrets.wayvnc_cfg.path}
           '');
           Type="exec";
+          Restart="on-failure";
+          RestartSec="5s";
         };
         Install = { 
           WantedBy = ["default.target"];
@@ -170,10 +177,17 @@ in
         };
       };
       ssds = {
-        Unit.Description = "Super Simple Digital Signage";
+        Unit = { 
+          Description = "Super Simple Digital Signage";
+          After = ["sway-session.target"];
+          StartLimitIntervalSec = 500;
+          StartLimitBurst = 5;
+        };
         Service = {
           ExecStart = "${pkgs.bash}/bin/bash /home/otto/ssds/presentation.sh";
           Type="exec";
+          Restart="on-failure";
+          RestartSec="5s";
         };
         Install = { 
           WantedBy = ["default.target"];
