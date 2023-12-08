@@ -187,6 +187,7 @@ in
           Type = "oneshot";
           ExecStart = toString ( pkgs.writeShellScript "soffice_refresh.sh" ''
             ${pkgs.killall}/bin/killall soffice.bin
+            ${pkgs.touch}/bin/touch /home/otto/Control/End
           '');
         };
       };
