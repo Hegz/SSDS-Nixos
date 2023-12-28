@@ -7,7 +7,7 @@ let
   # Add the home manager channel to the system 
   home-manager = builtins.fetchTarball {
     url = "https://github.com/nix-community/home-manager/archive/33110fb3c7fe6a94b98b641866a5eddb64b7c23f.tar.gz";
-    sha256 = "";
+    sha256 = "sha256:1gxlnjdmiw92qqmnp31hpdpw2via2xmy95fsnmlx0z177mxs669g";
     # Pinned to release date 28/Dec/2023
   }; 
   # Raspberry pi harware overlays
