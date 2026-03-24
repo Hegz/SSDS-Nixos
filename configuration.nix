@@ -42,10 +42,7 @@
     raspberry-pi."4".apply-overlays-dtmerge.enable = true;
     deviceTree.enable = true;
     raspberry-pi."4".fkms-3d.enable = true;
-    graphics = {
-      enable = true;
-      package = pkgs.mesa;
-    };
+    graphics.enable = true;
   };
 
   # Reduce overhead of journald a little
