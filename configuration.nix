@@ -2,10 +2,6 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running `nixos-help`).
 
-# NOTE: With flakes, home-manager, nixos-hardware, and sops-nix are
-# declared as flake inputs and wired in via flake.nix — the
-# builtins.fetchTarball calls and their imports have been removed.
-
 { config, pkgs, lib, ... }:
 {
   # Secrets control
