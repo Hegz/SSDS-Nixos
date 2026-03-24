@@ -28,11 +28,12 @@
     hostName = "nixos-ssds";
     wireless = {
       environmentFile = config.sops.secrets."wifi".path;
-      enable = true;
-      networks = {
-        "@essid@" = {
-          psk = "@psk@";
-        };
+      extraConfig = ''
+        network={
+          ssid="@essid@"
+          psk="@psk@"
+        }
+        ''
       };
     };
   };
