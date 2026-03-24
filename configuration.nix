@@ -19,7 +19,7 @@
       grub.enable = false;
       # Enables the generation of /boot/extlinux/extlinux.conf
       generic-extlinux-compatible.enable = true;
-      raspberryPi.firmwareConfig = ''gpu_mem=192'';
+      #raspberryPi.firmwareConfig = ''gpu_mem=192'';
     };
     plymouth.enable = false;
   };
