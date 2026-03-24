@@ -2,19 +2,19 @@
   description = "SSDS NixOS configuration for Raspberry Pi 4";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
 
     home-manager = {
-      url = "github:nix-community/home-manager/cf9686ba26f5ef788226843bc31fda4cf72e373b";
+      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nixos-hardware = {
-      url = "github:NixOS/nixos-hardware/2d4b4717b2534fad5c715968c1cece04a172b365";
+      url = "github:NixOS/nixos-hardware/";
     };
 
     sops-nix = {
-      url = "github:Mic92/sops-nix/632c3161a6cc24142c8e3f5529f5d81042571165";
+      url = "github:Mic92/sops-nix/";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
