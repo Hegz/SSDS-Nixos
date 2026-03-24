@@ -69,7 +69,7 @@
   # Define user accounts.
   users.users.dbert = {
     isNormalUser = true;
-    passwordFile = config.sops.secrets.dbert-pass.path;
+    hashedPasswordFile = config.sops.secrets.dbert-pass.path;
     extraGroups = [ "wheel" ];
   };
   users.users.otto = {
