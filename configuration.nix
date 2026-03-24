@@ -30,8 +30,7 @@
       enable = true;
       secretsFile = config.sops.secrets."wifi".path;
       networks = {
-        "@essid@"={
-          #ssid=ext:essid
+        "sd73-staff"={
           pskRaw="ext:psk";
         };
       };
