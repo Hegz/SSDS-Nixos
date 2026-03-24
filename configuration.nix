@@ -32,7 +32,7 @@
       extraConfig = ''
         network={
           ssid="@essid@"
-          psk="@psk@"
+          psk=ext:psk
         }
       '';
     };
