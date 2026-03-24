@@ -97,6 +97,7 @@
         { command = "exec /home/otto/ssds/wrapper.sh"; always = true; }
       ];
     };
+    wayland.windowManager.sway.checkConfig = false; # Don't check the config, since it references files that are pulled in from Git.
     # Import the SSDS files from Github.
     home.file."ssds".source = "${pkgs.fetchFromGitHub {
       owner = "Hegz";
