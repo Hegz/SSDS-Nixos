@@ -6,14 +6,20 @@
 let
   # Add the home manager channel to the system 
   home-manager = builtins.fetchTarball {
-    url = "https://github.com/nix-community/home-manager/archive/33110fb3c7fe6a94b98b641866a5eddb64b7c23f.tar.gz";
-    sha256 = "sha256:1gxlnjdmiw92qqmnp31hpdpw2via2xmy95fsnmlx0z177mxs669g";
+    url = "https://github.com/nix-community/home-manager/archive/cf9686ba26f5ef788226843bc31fda4cf72e373b.tar.gz";
+    sha256 = "sha256:19idpl3xa2g8225r24l1xvc18d32c9vzp04r37rh8lhcj6zyywbn";
+    # Pinned to release date 24/03/2026 
+    #url = "https://github.com/nix-community/home-manager/archive/33110fb3c7fe6a94b98b641866a5eddb64b7c23f.tar.gz";
+    #sha256 = "sha256:1gxlnjdmiw92qqmnp31hpdpw2via2xmy95fsnmlx0z177mxs669g";
     # Pinned to release date 28/Dec/2023
   }; 
   # Raspberry pi harware overlays
   nixos-hardware = builtins.fetchTarball {
-    url = "https://github.com/NixOS/nixos-hardware/archive/80d98a7d55c6e27954a166cb583a41325e9512d7.zip";
-    sha256 = "sha256:10017wi78lk746m16ca76dbywdzq495f65vxmav012slipzh7zxh";
+    url = "https://github.com/NixOS/nixos-hardware/archive/2d4b4717b2534fad5c715968c1cece04a172b365.tar.gz";
+    sha256 = "sha256:19samg4y5ip6m0zm06la66nayhij9jw8kxhvdf96dns0mp008xhw";
+    # Pinned to release date 24/03/2026
+    #url = "https://github.com/NixOS/nixos-hardware/archive/80d98a7d55c6e27954a166cb583a41325e9512d7.zip";
+    #sha256 = "sha256:10017wi78lk746m16ca76dbywdzq495f65vxmav012slipzh7zxh";
     # Pinned to release date 23/Oct/2023
   }; 
   # Sops secret management
