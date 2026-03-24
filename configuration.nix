@@ -44,7 +44,7 @@
     raspberry-pi."4".fkms-3d.enable = true;
     graphics = {
       enable = true;
-      package = pkgs.mesa_drivers;
+      package = pkgs.mesa;
     };
   };
 
