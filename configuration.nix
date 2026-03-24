@@ -42,9 +42,8 @@
     raspberry-pi."4".apply-overlays-dtmerge.enable = true;
     deviceTree.enable = true;
     raspberry-pi."4".fkms-3d.enable = true;
-    opengl = {
+    graphics = {
       enable = true;
-      setLdLibraryPath = true;
       package = pkgs.mesa_drivers;
     };
   };
