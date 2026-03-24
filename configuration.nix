@@ -27,6 +27,7 @@
   networking = {
     hostName = "nixos-ssds";
     wireless = {
+      enable = true;
       secretsFile = config.sops.secrets."wifi".path;
       extraConfig = ''
         network={
