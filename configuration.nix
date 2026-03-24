@@ -2,42 +2,12 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running `nixos-help`).
 
-{ config, pkgs, lib, ... }:
-let
-  # Add the home manager channel to the system 
-  home-manager = builtins.fetchTarball {
-    url = "https://github.com/nix-community/home-manager/archive/cf9686ba26f5ef788226843bc31fda4cf72e373b.tar.gz";
-    sha256 = "sha256:19idpl3xa2g8225r24l1xvc18d32c9vzp04r37rh8lhcj6zyywbn";
-    # Pinned to release date 24/03/2026 
-    #url = "https://github.com/nix-community/home-manager/archive/33110fb3c7fe6a94b98b641866a5eddb64b7c23f.tar.gz";
-    #sha256 = "sha256:1gxlnjdmiw92qqmnp31hpdpw2via2xmy95fsnmlx0z177mxs669g";
-    # Pinned to release date 28/Dec/2023
-  }; 
-  # Raspberry pi harware overlays
-  nixos-hardware = builtins.fetchTarball {
-    url = "https://github.com/NixOS/nixos-hardware/archive/2d4b4717b2534fad5c715968c1cece04a172b365.tar.gz";
-    sha256 = "sha256:19samg4y5ip6m0zm06la66nayhij9jw8kxhvdf96dns0mp008xhw";
-    # Pinned to release date 24/03/2026
-    #url = "https://github.com/NixOS/nixos-hardware/archive/80d98a7d55c6e27954a166cb583a41325e9512d7.zip";
-    #sha256 = "sha256:10017wi78lk746m16ca76dbywdzq495f65vxmav012slipzh7zxh";
-    # Pinned to release date 23/Oct/2023
-  }; 
-  # Sops secret management
-  sops-nix = builtins.fetchTarball {
-    url = "https://github.com/Mic92/sops-nix/archive/632c3161a6cc24142c8e3f5529f5d81042571165.zip";
-    sha256 = "sha256:0lbw6ci3z2ciqnfszk942c3w8drn7qbnhha1bc1praj660x3gkgd";
-    # Pinned to release date 28/Oct/2023
-  }; 
-in
-{
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      (import "${home-manager}/nixos")
-      (import "${nixos-hardware}/raspberry-pi/4")
-      (import "${sops-nix}/modules/sops")
-    ];
+# NOTE: With flakes, home-manager, nixos-hardware, and sops-nix are
+# declared as flake inputs and wired in via flake.nix — the
+# builtins.fetchTarball calls and their imports have been removed.
 
+{ config, pkgs, lib, ... }:
+{
   # Secrets control
   sops.defaultSopsFile = ./secrets/secrets.yaml;
   sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
@@ -46,7 +16,7 @@ in
   sops.secrets.wayvnc_cfg = {
     owner = config.users.users.otto.name;
   };
-  
+
   boot = {
     loader = {
       # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
@@ -59,10 +29,10 @@ in
   };
 
   networking = {
-    hostName = "nixos-ssds"; # Define your hostname.
+    hostName = "nixos-ssds";
     wireless = {
       environmentFile = config.sops.secrets."wifi".path;
-      enable = true;  # Enables wireless support via wpa_supplicant.
+      enable = true;
       networks = {
         "@essid@" = {
           psk = "@psk@";
@@ -83,7 +53,7 @@ in
     };
   };
 
-  # Reduce overhead of journald a little 
+  # Reduce overhead of journald a little
   services.journald.extraConfig = ''
     SystemMaxFileSize=50M
     Storage=volatile
@@ -92,7 +62,7 @@ in
   # Set time zone.
   time.timeZone = "America/Vancouver";
 
-  # Eable Sway window manager
+  # Enable Sway window manager
   programs.sway.enable = true;
 
   # Enable user autologin and sway startup
@@ -101,7 +71,7 @@ in
     [[ "$(tty)" == /dev/tty1 ]] && WLR_LIBINPUT_NO_DEVICES=1 sway
     '';
 
-  # Define a user accounts. 
+  # Define user accounts.
   users.users.dbert = {
     isNormalUser = true;
     passwordFile = config.sops.secrets.dbert-pass.path;
@@ -126,17 +96,17 @@ in
   };
 
   home-manager.users.otto = { pkgs, lib, ... }: {
-    # Enable sway managment, and set options
+    # Enable sway management, and set options
     wayland.windowManager.sway.enable = true;
     wayland.windowManager.sway.config = {
       seat = { "*" = { hide_cursor = "600"; }; };
-      output = { "*" = { bg ="~/ssds/School_District_73.jpg fill"; }; };
+      output = { "*" = { bg = "~/ssds/School_District_73.jpg fill"; }; };
       startup = [
-         { command = "exec /home/otto/ssds/wrapper.sh"; always=true; }
+        { command = "exec /home/otto/ssds/wrapper.sh"; always = true; }
       ];
     };
     # Import the SSDS files from Github.
-    home.file."ssds".source = "${pkgs.fetchFromGitHub { 
+    home.file."ssds".source = "${pkgs.fetchFromGitHub {
       owner = "Hegz";
       repo = "SSDS";
       rev = "5f9e20137a2a11173008078eef1d7226669529ba";
@@ -167,8 +137,8 @@ in
       '';
     };
     systemd.user.services = {
-      wayvnc = { 
-        Unit = { 
+      wayvnc = {
+        Unit = {
           Description = "Wayvnc screen sharing";
           After = ["sway-session.target"];
           StartLimitIntervalSec = 500;
@@ -178,16 +148,16 @@ in
           ExecStart = toString ( pkgs.writeShellScript "launch_wayvnc.sh" ''
             ${pkgs.wayvnc}/bin/wayvnc -v --config=${config.sops.secrets.wayvnc_cfg.path}
           '');
-          Type="exec";
-          Restart="on-failure";
-          RestartSec="5s";
+          Type = "exec";
+          Restart = "on-failure";
+          RestartSec = "5s";
         };
-        Install = { 
+        Install = {
           WantedBy = ["default.target"];
           After = ["sway-session.target"];
         };
       };
-      # Open office has a memory leak.  refresh it dailiy at 6:00am
+      # Open office has a memory leak. Refresh it daily at 6:00am
       office_refresh = {
         Unit.Description = "Nightly Libreoffice Refresh";
         Service = {
@@ -212,9 +182,9 @@ in
     home.stateVersion = "23.05";  # Required
   };
 
-  # packages installed in system profile.
+  # Packages installed in system profile.
   environment.systemPackages = with pkgs; [
-    vim 
+    vim
     git
     libcec
     htop
@@ -222,7 +192,7 @@ in
     raspberrypi-eeprom
     killall
   ];
-  
+
   # CEC related configuration
   nixpkgs.overlays = [
     (self: super: { libcec = super.libcec.override { withLibraspberrypi = true; }; })
@@ -240,5 +210,5 @@ in
   # 5900 - VNC
   networking.firewall.allowedTCPPorts = [ 5900 ];
 
-  system.stateVersion = "23.05"; # Required 
+  system.stateVersion = "23.05"; # Required
 }
