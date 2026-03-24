@@ -31,7 +31,7 @@
       secretsFile = config.sops.secrets."wifi".path;
       extraConfig = ''
         network={
-          ssid="@essid@"
+          ssid=ext:essid
           psk=ext:psk
         }
       '';
