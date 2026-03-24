@@ -29,12 +29,12 @@
     wireless = {
       enable = true;
       secretsFile = config.sops.secrets."wifi".path;
-      extraConfig = ''
-        network={
-          ssid=ext:essid
-          psk=ext:psk
-        }
-      '';
+      networks = {
+        "@essid@"={
+          #ssid=ext:essid
+          pskRaw="ext:psk";
+        };
+      };
     };
   };
 
