@@ -6,4 +6,4 @@ echo Killing LibreOffice
 killall soffice.bin || true
 
 echo Deploying system
-sudo nixos-rebuild switch --flake .#nixos-ssds --option extra-experimental-features "nix-command flakes"
+sudo nixos-rebuild switch --flake .#nixos-ssds
