@@ -8,7 +8,11 @@
   sops.defaultSopsFile = ./secrets/secrets.yaml;
   sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
   sops.secrets.dbert-pass.neededForUsers = true;
-  sops.secrets.wifi = {};
+  sops.secrets.wifi = {
+    owner = "wpa_supplicant";
+    group = "wpa_supplicant";
+    mode = "0440";
+  };
   sops.secrets.wayvnc_cfg = {
     owner = config.users.users.otto.name;
   };
