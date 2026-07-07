@@ -22,6 +22,8 @@
       #raspberryPi.firmwareConfig = ''gpu_mem=192'';
     };
     plymouth.enable = false;
+    kernelPackages = pkgs.linuxPackages;
+
   };
 
   networking = {
@@ -41,7 +43,7 @@
   hardware = {
     raspberry-pi."4".apply-overlays-dtmerge.enable = true;
     deviceTree.enable = true;
-    raspberry-pi."4".fkms-3d.enable = true;
+    #raspberry-pi."4".fkms-3d.enable = true;
     graphics.enable = true;
   };
 
