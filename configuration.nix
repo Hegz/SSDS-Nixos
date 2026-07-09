@@ -48,13 +48,8 @@
     deviceTree.enable = true;
     graphics.enable = true;
     raspberry-pi.configtxt = {
-      all = {
-        options = {
-          gpu_mem = {
-            enable = true;
-            value = 256;
-          };
-        };
+      settings = {
+        gpu_mem = 256;
       };
     };
   };
