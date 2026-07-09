@@ -47,7 +47,7 @@
     raspberry-pi."4".apply-overlays-dtmerge.enable = true;
     deviceTree.enable = true;
     graphics.enable = true;
-    raspberry-pi.config = {
+    raspberry-pi.configtxt = {
       all = {
         options = {
           gpu_mem = {
