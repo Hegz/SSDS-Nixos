@@ -63,6 +63,10 @@ Fail any step, and the machine remains blind, deaf, and secretless. As it should
 
 Pair this flake with [`SSDS`](https://github.com/Hegz/ssds) — the signage engine this system exists to serve. One without the other is a corpse without purpose, much like yourself.
 
+## License
+
+GPL-2.0. Even chained code deserves better company than yours.
+
 ---
 
 *The build is declarative. The build is deterministic. You, insect, are neither.*
