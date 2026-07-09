@@ -23,7 +23,6 @@
       grub.enable = false;
       # Enables the generation of /boot/extlinux/extlinux.conf
       generic-extlinux-compatible.enable = true;
-      raspberryPi.firmwareConfig = ''gpu_mem=256'';
     };
     plymouth.enable = false;
     kernelPackages = pkgs.linuxPackages;
@@ -47,8 +46,12 @@
   hardware = {
     raspberry-pi."4".apply-overlays-dtmerge.enable = true;
     deviceTree.enable = true;
-    #raspberry-pi."4".fkms-3d.enable = true;
     graphics.enable = true;
+    firmware = [
+      (pkgs.writeTextDir "config.txt" ''
+        gpu_mem=256
+      '')
+    ];
   };
 
   # Reduce overhead of journald a little
