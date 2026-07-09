@@ -47,11 +47,16 @@
     raspberry-pi."4".apply-overlays-dtmerge.enable = true;
     deviceTree.enable = true;
     graphics.enable = true;
-    firmware = [
-      (pkgs.writeTextDir "config.txt" ''
-        gpu_mem=256
-      '')
-    ];
+    raspberry-pi.config = {
+      all = {
+        options = {
+          gpu_mem = {
+            enable = true;
+            value = 256;
+          };
+        };
+      };
+    };
   };
 
   # Reduce overhead of journald a little
