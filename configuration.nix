@@ -23,7 +23,7 @@
       grub.enable = false;
       # Enables the generation of /boot/extlinux/extlinux.conf
       generic-extlinux-compatible.enable = true;
-      #raspberryPi.firmwareConfig = ''gpu_mem=192'';
+      raspberryPi.firmwareConfig = ''gpu_mem=256'';
     };
     plymouth.enable = false;
     kernelPackages = pkgs.linuxPackages;
@@ -78,6 +78,7 @@
   users.users.otto = {
     isNormalUser = true;
     createHome = true;
+    extraGroups = [ "networkmanager" "wheel" "video" "render" ];
     openssh.authorizedKeys.keys = [
       "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAwaF65IvEZtjv5zCxQlCsJ5ThymSwXocfxk3uBaDlFLZXdqVw+KFb83GNwj1UDYsPCEz2RwXjs8XHxrIS72Npm+OKhlR/adbY6Q+Gtx+bM+PDKlHxOzNgYkIVHV0B8RHLVmTMjLwwOXayiolR8WuljvLjLcvRLkx1WgQgwdCuvQvCV99Gfyn9uUH7wcfdPd/SlRqPJ6k6h0J1Z/E+FlBJADxNObwlXpyhAVhlKdepT9Wo62rQfDfXDXawSRjUfDVHZkBnx7c9FH1eralLF8ILjXv1zR7It7juOgW2dtvvLWL15UKClWNfK15EWq/lp0vtR1rzueL9FtoyqKP98YBvlQ== sys-automation@server"
     ];
@@ -108,8 +109,8 @@
     home.file."ssds".source = "${pkgs.fetchFromGitHub {
       owner = "Hegz";
       repo = "SSDS";
-      rev = "abaddcb9bb6e3b51e5fb5770addad32557e3093b";
-      hash = "sha256-SVzPtqSbSi9MwlKUzOgQmj3x1a5TuY3pHsUHwHd5RA8=";
+      rev = "21929ea300b5d7655caac4a04fd335b51927bf06";
+      hash = "sha256-5gIlg4z0nVvO36Ir6e/Iw7k+xgdsmnA95/ZO+j8qFYc=";
     }}";
 
     home.activation = {
