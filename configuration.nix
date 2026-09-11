@@ -112,8 +112,8 @@
     home.file."ssds".source = "${pkgs.fetchFromGitHub {
       owner = "Hegz";
       repo = "SSDS";
-      rev = "f677b7c9ebda39352619795c03bd069a78a0c495";
-      hash = "sha256-H1OFClveMrg3SzOCCxmNWsKQzXrzF3PVKLmjTlR96mw=";
+      rev = "8df7d2105a4d6c78727f09e471dd3ca230237601";
+      hash = "sha256-VCoIpScE7acCAKfUOUGwpAldHwoOaNaFD1MUnYsmfeI=";
     }}";
 
     home.activation = {
@@ -201,6 +201,8 @@
           Type = "oneshot";
           ExecStart = toString ( pkgs.writeShellScript "soffice_refresh.sh" ''
             ${pkgs.killall}/bin/killall soffice.bin
+            sleep 2
+            ${pkgs.findutils}/bin/find /home/otto/Presentation -maxdepth 1 -type f -name ".~lock.*.odp#" -delete
             ${pkgs.coreutils-full}/bin/touch /home/otto/Control/End
           '');
         };
