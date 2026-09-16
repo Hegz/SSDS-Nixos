@@ -112,8 +112,9 @@
     home.file."ssds".source = "${pkgs.fetchFromGitHub {
       owner = "Hegz";
       repo = "SSDS";
-      rev = "8df7d2105a4d6c78727f09e471dd3ca230237601";
-      hash = "sha256-VCoIpScE7acCAKfUOUGwpAldHwoOaNaFD1MUnYsmfeI=";
+  rev = "3415019e2d78090c044ce450c98344216a9ae808";
+  hash = "sha256-jNJwQ5/rfg1lVtmWHFCh2zb2iq6HcHos9rlBFnX7pGw=";
+
     }}";
 
     home.activation = {
@@ -157,7 +158,41 @@
         };
         Install = {
           WantedBy = ["default.target"];
-          After = ["sway-session.target"];
+        };
+      };
+      # Watchdog: systemd's own Restart=on-failure gives up once
+      # StartLimitBurst is exhausted within StartLimitIntervalSec, leaving
+      # wayvnc dead until something manually clears it. This also catches
+      # the case systemd can't see at all -- wayvnc alive but hung and no
+      # longer actually accepting connections.
+      wayvnc_watchdog = {
+        Unit.Description = "WayVNC reachability watchdog";
+        Service = {
+          Type = "oneshot";
+          ExecStart = toString ( pkgs.writeShellScript "wayvnc_watchdog.sh" ''
+            set -u
+            SYSTEMCTL=${pkgs.systemd}/bin/systemctl
+
+            STATE=$($SYSTEMCTL --user is-active wayvnc.service 2>/dev/null || true)
+
+            if [ "$STATE" = "failed" ]; then
+              logger -t wayvnc-watchdog "wayvnc failed, likely hit its restart limit -- clearing and restarting"
+              $SYSTEMCTL --user reset-failed wayvnc.service
+              $SYSTEMCTL --user restart wayvnc.service
+              exit 0
+            fi
+
+            if [ "$STATE" != "active" ]; then
+              logger -t wayvnc-watchdog "wayvnc is $STATE, not active -- starting"
+              $SYSTEMCTL --user start wayvnc.service
+              exit 0
+            fi
+
+            if ! timeout 3 ${pkgs.bash}/bin/bash -c 'exec 3<>/dev/tcp/127.0.0.1/5900' 2>/dev/null; then
+              logger -t wayvnc-watchdog "wayvnc reports active but port 5900 refused connection -- restarting"
+              $SYSTEMCTL --user restart wayvnc.service
+            fi
+          '');
         };
       };
       # Open office has a memory leak. Refresh it daily at 6:00am
@@ -167,6 +202,8 @@
           Type = "oneshot";
           ExecStart = toString ( pkgs.writeShellScript "soffice_refresh.sh" ''
             ${pkgs.killall}/bin/killall soffice.bin
+            sleep 2
+            ${pkgs.findutils}/bin/find /home/otto/Presentation -maxdepth 1 -type f -name ".~lock.*.odp#" -delete
             ${pkgs.coreutils-full}/bin/touch /home/otto/Control/End
           '');
         };
@@ -178,6 +215,15 @@
         Timer = {
           Unit = "office_refresh.service";
           OnCalendar = "06:00";
+        };
+        Install.WantedBy = [ "timers.target" ];
+      };
+      wayvnc_watchdog = {
+        Unit.Description = "WayVNC watchdog schedule";
+        Timer = {
+          Unit = "wayvnc_watchdog.service";
+          OnBootSec = "2m";
+          OnUnitActiveSec = "2m";
         };
         Install.WantedBy = [ "timers.target" ];
       };
@@ -212,6 +258,21 @@
   # Open ports in the firewall.
   # 5900 - VNC
   networking.firewall.allowedTCPPorts = [ 5900 ];
+
+  # Flakes are required for the auto-upgrade below. Harmless if already
+  # enabled elsewhere (e.g. in flake.nix's nixConfig).
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # Pull and apply the latest commit on the tracked branch daily. Point
+  # this at your actual system flake repo/hostname -- "Hegz/SSDS-nixos"
+  # is a guess based on your shell prompt earlier in this conversation,
+  # not a confirmed fact, so verify it before relying on this.
+  system.autoUpgrade = {
+    enable = true;
+    flake = "github:Hegz/SSDS-nixos#nixos-ssds";
+    dates = "04:00";
+    operation = "switch";
+  };
 
   system.stateVersion = "23.05"; # Required
 }
