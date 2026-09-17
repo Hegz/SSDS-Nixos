@@ -56,8 +56,11 @@
 
   # Reduce overhead of journald a little
   services.journald.extraConfig = ''
-    SystemMaxFileSize=50M
-    Storage=volatile
+    Storage=persistent
+    Compress=yes
+    SystemMaxUse=50M
+    SystemMaxFileSize=10M
+    SystemMaxFiles=5
   '';
 
   # Set time zone.
