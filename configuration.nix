@@ -126,6 +126,7 @@
       # Generate the libreoffice .config files / directories, then link in the macros
       libreofficesetup = lib.hm.dag.entryAfter ["writeBoundary"] ''
         $DRY_RUN_CMD rm -rf /home/otto/.config/libreoffice
+        $DRY_RUN_CMD mkdir -p /home/otto/.config/libreoffice/4/user/basic/;
         $DRY_RUN_CMD ${pkgs.libreoffice}/bin/libreoffice --terminate_after_init --headless;
         $DRY_RUN_CMD rm -rf /home/otto/.config/libreoffice/4/user/basic/Standard;
         $DRY_RUN_CMD ln -s /home/otto/ssds/Standard /home/otto/.config/libreoffice/4/user/basic/;
