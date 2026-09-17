@@ -13,6 +13,10 @@
     group = "wpa_supplicant";
     mode = "0440";
   };
+  
+  # Needed to allow building of Guac
+  nixpkgs.config.allowUnsupportedSystem = true;
+
 
   boot = {
     loader = {
