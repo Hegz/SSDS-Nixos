@@ -3,7 +3,7 @@ echo Pulling latest changes
 git pull
 
 echo Killing LibreOffice
-killall soffice.bin || true
+sudo killall soffice.bin || true
 
 echo Deploying system
 sudo nixos-rebuild switch --flake .#nixos-ssds --option extra-experimental-features "nix-command flakes"
