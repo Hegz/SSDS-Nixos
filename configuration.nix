@@ -73,13 +73,13 @@
   # Secret Management via sops-nix
   sops.secrets.guac_admin_password = {
     # Ensure Tomcat/Guacamole user can read the decrypted secret
-    owner = config.services.guacamole-client.user;
+    owner = "tomcat";
   };
 
   # Render the user-mapping.xml securely in /run/secrets/ at boot
   sops.templates."guacamole-user-mapping.xml" = {
-    owner = config.services.guacamole-client.user;
-    group = config.services.guacamole-client.group;
+    owner = "tomcat";
+    group = "tomcat";
     mode = "0600";
 
     content = ''
