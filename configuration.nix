@@ -109,7 +109,6 @@
   services.guacamole-client = {
     enable = true;
     enableWebserver = true; # Automatically provisions Apache Tomcat
-    settings = { guacd-port = 8080; };
 
     settings = {
       guacd-hostname = "127.0.0.1";
