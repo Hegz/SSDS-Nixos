@@ -96,6 +96,14 @@
     "SAL_DISABLE_GL" = "1";
   };
 
+  environment.etc."wireplumber/main.lua.d/90-suspend-timeout.lua" = {
+  text = ''
+    apply_properties = {
+      ["session.suspend-timeout-seconds"] = 0
+    }
+    '';
+  };
+
   # Define user accounts.
   users.users.dbert = {
     isNormalUser = true;
