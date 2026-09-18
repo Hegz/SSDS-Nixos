@@ -26,6 +26,10 @@
     };
     plymouth.enable = false;
     kernelPackages = pkgs.linuxPackages;
+    kernelParams = [
+      "vc4.force_hotplug=1"
+      # "video=HDMI-A-2:1920x1080M@60" # Falesafe to force 1080p 
+    ];
 
   };
 
@@ -74,6 +78,23 @@
   environment.loginShellInit = ''
     [[ "$(tty)" == /dev/tty1 ]] && WLR_LIBINPUT_NO_DEVICES=1 sway
     '';
+
+  environment.variables = {
+    # Forces Mesa to scale back aggressive multi-threading
+    "mesa_glthread" = "false";
+
+    # CRITICAL FOR SWAY: Tells wlroots to use a legacy rendering path 
+    # if the hardware fails to respond to modern atomic page-flips in time
+    "WLR_DRM_NO_ATOMIC" = "1";
+
+    # Prevents wlroots from trying to grab hardware cursors, 
+    # which often triggers the vc4-drm 'commit wait timed out' bug
+    "WLR_NO_HARDWARE_CURSORS" = "1";
+
+    # Prevents LibreOffice from trying to use complex OpenGL transitions
+    # that can freeze the vc4 GPU pipeline over time
+    "SAL_DISABLE_GL" = "1";
+  };
 
   # Define user accounts.
   users.users.dbert = {
