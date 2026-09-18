@@ -67,13 +67,6 @@
   # Enable Sway window manager
   programs.sway.enable = true;
 
-  # PipeWire is required for Lamco to capture Wayland frames
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    pulse.enable = true;
-  };
-
   # Secret Management via sops-nix
   sops.secrets.guac_admin_password = {
     # Ensure Tomcat/Guacamole user can read the decrypted secret
@@ -260,7 +253,7 @@
             if ! timeout 3 ${pkgs.bash}/bin/bash -c 'exec 3<>/dev/tcp/127.0.0.1/5900' 2>/dev/null; then
               logger -t wayvnc-watchdog "wayvnc reports active but port 5900 refused connection -- restarting"
               $SYSTEMCTL --user restart wayvnc.service
-            fi
+         fi
           '');
         };
       };
@@ -311,6 +304,7 @@
     raspberrypi-eeprom
     killall
     wayvnc
+    nss
   ];
 
   # CEC related configuration
