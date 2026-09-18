@@ -123,9 +123,6 @@
       # HTTPS endpoint
       "https://:443" = {
         extraConfig = ''
-          tls internal {
-            install_trust off
-          }
           tls internal
           redir / /guacamole/ 302
           reverse_proxy 127.0.0.1:8080
