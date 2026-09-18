@@ -27,7 +27,7 @@
     content = ''
       <user-mapping>
         <authorize username="dbert" password="${config.sops.placeholder.guac_admin_password}">
-          <connection name="Sway Desktop (Lamco RDP)">
+          <connection name="Sway Desktop (wayvnc)">
             <protocol>vnc</protocol>
             <param name="hostname">127.0.0.1</param>
             <param name="port">5900</param>
