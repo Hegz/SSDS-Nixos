@@ -121,15 +121,18 @@
     enable = true;
     virtualHosts = {
       # HTTPS endpoint
-      ":443" = {
+      "https://:443" = {
         extraConfig = ''
+          tls internal {
+            install_trust off
+          }
           tls internal
           redir / /guacamole/ 302
           reverse_proxy 127.0.0.1:8080
         '';
       };
       # HTTP -> HTTPS redirect
-      ":80" = {
+      "http://:80" = {
         extraConfig = ''
           redir https://{host}{uri} permanent
         '';
@@ -304,7 +307,6 @@
     raspberrypi-eeprom
     killall
     wayvnc
-    nss
   ];
 
   # CEC related configuration
