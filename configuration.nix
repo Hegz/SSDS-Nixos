@@ -116,9 +116,14 @@
   # serve Guacamole at / using tls
   services.caddy = {
     enable = true;
+
+    globalConfig = ''
+      default_sni guac.local
+    ''
+
     virtualHosts = {
       # HTTPS endpoint
-      "https://:443" = {
+      "guac.local, :443" = {
         extraConfig = ''
           tls internal
           redir / /guacamole/ 302
@@ -131,7 +136,7 @@
         '';
       };
       # HTTP -> HTTPS redirect
-      "http://:80" = {
+      "http://localhost:80" = {
         extraConfig = ''
           redir https://{host}{uri} permanent
         '';
