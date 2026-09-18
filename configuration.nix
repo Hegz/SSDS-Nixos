@@ -83,12 +83,9 @@
       <user-mapping>
         <authorize username="dbert" password="${config.sops.placeholder.guac_admin_password}">
           <connection name="Sway Desktop (Lamco RDP)">
-            <protocol>rdp</protocol>
+            <protocol>vnc</protocol>
             <param name="hostname">127.0.0.1</param>
-            <param name="port">3389</param>
-            <param name="ignore-cert">true</param>
-            <!-- Enables RDP audio/video stream handling -->
-            <param name="enable-audio">true</param>
+            <param name="port">5900</param>
           </connection>
         </authorize>
       </user-mapping>
