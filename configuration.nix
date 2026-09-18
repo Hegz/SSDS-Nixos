@@ -28,7 +28,7 @@
     kernelPackages = pkgs.linuxPackages;
     kernelParams = [
       "vc4.force_hotplug=1"
-      # "video=HDMI-A-2:1920x1080M@60" # Falesafe to force 1080p 
+      "video=HDMI-A-2:1920x1080M@60" # Falesafe to force 1080p 
     ];
 
   };
@@ -81,11 +81,12 @@
 
   environment.variables = {
     # Forces Mesa to scale back aggressive multi-threading
-    "mesa_glthread" = "false";
+    # "mesa_glthread" = "false";
 
     # CRITICAL FOR SWAY: Tells wlroots to use a legacy rendering path 
     # if the hardware fails to respond to modern atomic page-flips in time
-    "WLR_DRM_NO_ATOMIC" = "1";
+    # Interfears with wayvnc.... not optimal...
+    # "WLR_DRM_NO_ATOMIC" = "1";
 
     # Prevents wlroots from trying to grab hardware cursors, 
     # which often triggers the vc4-drm 'commit wait timed out' bug
