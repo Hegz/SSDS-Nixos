@@ -30,7 +30,28 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+
+  environment.variables = {
+    # Forces Mesa to scale back aggressive multi-threading
+    "mesa_glthread" = "false";
+
+    # Prevents wlroots from trying to grab hardware cursors,
+    # which often triggers the vc4-drm 'commit wait timed out' bug
+    "WLR_NO_HARDWARE_CURSORS" = "1";
+
+    # Prevents LibreOffice from trying to use complex OpenGL transitions
+    # that can freeze the vc4 GPU pipeline over time
+    "SAL_DISABLE_GL" = "1";
+  };
   
+  environment.etc."wireplumber/main.lua.d/90-suspend-timeout.conf" = {
+  text = ''
+    wireplumber.settings = {
+      "session.suspend-timeout-seconds" = 0
+    }
+    '';
+  };
+ 
   # Records the commit hash this generation was built from. Surfaced by
   # `nixos-version --json` as "configurationRevision" -- compare across
   # days to see whether the last auto-upgrade run actually changed anything.

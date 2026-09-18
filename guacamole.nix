@@ -31,7 +31,7 @@
 
     virtualHosts = {
       # HTTPS endpoint
-      "guac.local, :443" = {
+      "guac.local, *, :443" = {
         extraConfig = ''
           tls internal
           redir / /guacamole/ 302

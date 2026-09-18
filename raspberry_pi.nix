@@ -9,6 +9,10 @@
     };
     plymouth.enable = false;
     kernelPackages = pkgs.linuxPackages;
+    kernelParams = [
+      "vc4.force_hotplug=1"
+      "video=HDMI-A-2:1920x1080M@60" # Falesafe to force 1080p
+    ];
   };
 
   # Raspberry Pi 4b hardware settings
