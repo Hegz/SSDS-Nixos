@@ -119,7 +119,7 @@
 
     globalConfig = ''
       default_sni guac.local
-    ''
+    '';
 
     virtualHosts = {
       # HTTPS endpoint
