@@ -180,7 +180,6 @@
       seat = { "*" = { hide_cursor = "600"; }; };
       output = { "*" = { bg = "~/ssds/School_District_73.jpg fill"; }; };
       startup = [
-        { command = "lamco-rdp-server --bind 127.0.0.1:3389"; always = true; }
         { command = "exec /home/otto/ssds/wrapper.sh"; always = true; }
       ];
     };
@@ -212,6 +211,60 @@
       # Link VNC config into place
     };
     systemd.user.services = {
+      wayvnc = {
+        Unit = {
+          Description = "Wayvnc screen sharing";
+          After = ["sway-session.target"];
+          StartLimitIntervalSec = 500;
+          StartLimitBurst = 5;
+        };
+        Service = {
+          ExecStart = toString ( pkgs.writeShellScript "launch_wayvnc.sh" ''
+            ${pkgs.wayvnc}/bin/wayvnc -v 127.0.0.1 5900'');
+          Type = "exec";
+          Restart = "on-failure";
+          RestartSec = "5s";
+        };
+        Install = {
+          WantedBy = ["default.target"];
+        };
+      };
+      # Watchdog: systemd's own Restart=on-failure gives up once
+      # StartLimitBurst is exhausted within StartLimitIntervalSec, leaving
+      # wayvnc dead until something manually clears it. This also catches
+      # the case systemd can't see at all -- wayvnc alive but hung and no
+      # longer actually accepting connections.
+      wayvnc_watchdog = {
+        Unit.Description = "WayVNC reachability watchdog";
+        Service = {
+          Type = "oneshot";
+          ExecStart = toString ( pkgs.writeShellScript "wayvnc_watchdog.sh" ''
+            set -u
+            SYSTEMCTL=${pkgs.systemd}/bin/systemctl
+
+            STATE=$($SYSTEMCTL --user is-active wayvnc.service 2>/dev/null || true)
+
+            if [ "$STATE" = "failed" ]; then
+              logger -t wayvnc-watchdog "wayvnc failed, likely hit its restart limit -- clearing and restarting"
+              $SYSTEMCTL --user reset-failed wayvnc.service
+              $SYSTEMCTL --user restart wayvnc.service
+              exit 0
+            fi
+
+            if [ "$STATE" != "active" ]; then
+              logger -t wayvnc-watchdog "wayvnc is $STATE, not active -- starting"
+              $SYSTEMCTL --user start wayvnc.service
+              exit 0
+            fi
+
+            if ! timeout 3 ${pkgs.bash}/bin/bash -c 'exec 3<>/dev/tcp/127.0.0.1/5900' 2>/dev/null; then
+              logger -t wayvnc-watchdog "wayvnc reports active but port 5900 refused connection -- restarting"
+              $SYSTEMCTL --user restart wayvnc.service
+            fi
+          '');
+        };
+      };
+
       # Open office has a memory leak. Refresh it daily at 6:00am
       office_refresh = {
         Unit.Description = "Nightly Libreoffice Refresh";
@@ -235,6 +288,15 @@
         };
         Install.WantedBy = [ "timers.target" ];
       };
+      wayvnc_watchdog = {
+        Unit.Description = "WayVNC watchdog schedule";
+        Timer = {
+          Unit = "wayvnc_watchdog.service";
+          OnBootSec = "2m";
+          OnUnitActiveSec = "2m";
+        };
+        Install.WantedBy = [ "timers.target" ];
+      };
     };
     home.stateVersion = "23.05";  # Required
   };
@@ -248,7 +310,7 @@
     libraspberrypi
     raspberrypi-eeprom
     killall
-    lamco-rdp-server    
+    wayvnc
   ];
 
   # CEC related configuration
