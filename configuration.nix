@@ -31,6 +31,19 @@
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
   
+  # Records the commit hash this generation was built from. Surfaced by
+  # `nixos-version --json` as "configurationRevision" -- compare across
+  # days to see whether the last auto-upgrade run actually changed anything.
+  system.configurationRevision = gitRev;
+
+  environment.motd = ''
+    Welcom to Super Simple Digital Signage
+    
+    Current version: 
+    NixOS ${config.system.nixos.label}
+    Build:  ${gitShortRev}  (${gitDate})
+  '';
+  
   # Packages installed in system profile.
   environment.systemPackages = with pkgs; [
 	git
