@@ -4,7 +4,7 @@
 #
 # This file only wires together the split-out modules below. Each
 # module owns one concern; see the individual files for details.
-{ config, pkgs, lib, ... }:
+{ config, gitRev, gitShortRev, gitDate, pkgs, lib, ... }:
 {
   imports = [
     ./guacamole.nix
