@@ -320,8 +320,7 @@
   services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # 5900 - VNC
-  networking.firewall.allowedTCPPorts = [ 80 443 ];
+  networking.firewall.allowedTCPPorts = [ 80 443 8080 ];
 
   # Flakes are required for the auto-upgrade below. Harmless if already
   # enabled elsewhere (e.g. in flake.nix's nixConfig).
