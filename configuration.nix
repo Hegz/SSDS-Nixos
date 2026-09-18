@@ -36,7 +36,7 @@
   # days to see whether the last auto-upgrade run actually changed anything.
   system.configurationRevision = gitRev;
 
-  environment.motd = ''
+  users.motd = ''
     Welcom to Super Simple Digital Signage
     
     Current version: 
