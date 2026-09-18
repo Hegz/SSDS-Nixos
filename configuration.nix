@@ -96,10 +96,10 @@
     "SAL_DISABLE_GL" = "1";
   };
 
-  environment.etc."wireplumber/main.lua.d/90-suspend-timeout.lua" = {
+  environment.etc."wireplumber/main.lua.d/90-suspend-timeout.conf" = {
   text = ''
-    apply_properties = {
-      ["session.suspend-timeout-seconds"] = 0
+    wireplumber.settings = {
+      "session.suspend-timeout-seconds" = 0
     }
     '';
   };
