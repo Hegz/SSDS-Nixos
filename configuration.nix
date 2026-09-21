@@ -1,63 +1,89 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running `nixos-help`).
-
-{ config, pkgs, lib, ... }:
+#
+# This file only wires together the split-out modules below. Each
+# module owns one concern; see the individual files for details.
+{ config, gitRev, gitShortRev, gitDate, pkgs, lib, ... }:
 {
-  # Secrets control
-  sops.defaultSopsFile = ./secrets/secrets.yaml;
-  sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-  sops.secrets.dbert-pass.neededForUsers = true;
-  sops.secrets.wifi = {
-    owner = "wpa_supplicant";
-    group = "wpa_supplicant";
-    mode = "0440";
-  };
-  sops.secrets.wayvnc_cfg = {
-    owner = config.users.users.otto.name;
-  };
-
-  boot = {
-    loader = {
-      # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
-      grub.enable = false;
-      # Enables the generation of /boot/extlinux/extlinux.conf
-      generic-extlinux-compatible.enable = true;
-    };
-    plymouth.enable = false;
-    kernelPackages = pkgs.linuxPackages;
-
-  };
-
+  imports = [
+    ./guacamole.nix
+    ./otto.nix
+    ./raspberry_pi.nix
+    ./secrets.nix
+  ];
+  
   networking = {
     hostName = "nixos-ssds";
     wireless = {
       enable = true;
       secretsFile = config.sops.secrets."wifi".path;
       networks = {
-        "sd73-staff"={
-          pskRaw="ext:psk";
+        "sd73-staff" = {
+          pskRaw = "ext:psk";
         };
       };
     };
+    # Allow ports for Guacamole
+    firewall.allowedTCPPorts = [ 80 443 ];
   };
 
-  # Raspberry Pi 4b hardware settings
-  hardware = {
-    raspberry-pi."4".apply-overlays-dtmerge.enable = true;
-    deviceTree.enable = true;
-    graphics.enable = true;
-    raspberry-pi.configtxt = {
-      settings = {
-        gpu_mem = 256;
-      };
-    };
+  # Enable the OpenSSH daemon.
+  services.openssh.enable = true;
+
+  environment.variables = {
+    # Forces Mesa to scale back aggressive multi-threading
+    "mesa_glthread" = "false";
+
+    # Prevents wlroots from trying to grab hardware cursors,
+    # which often triggers the vc4-drm 'commit wait timed out' bug
+    "WLR_NO_HARDWARE_CURSORS" = "1";
+
+    # Prevents LibreOffice from trying to use complex OpenGL transitions
+    # that can freeze the vc4 GPU pipeline over time
+    "SAL_DISABLE_GL" = "1";
   };
+  
+  environment.etc."wireplumber/main.lua.d/90-suspend-timeout.conf" = {
+  text = ''
+    wireplumber.settings = {
+      "session.suspend-timeout-seconds" = 0
+    }
+    '';
+  };
+ 
+  # Records the commit hash this generation was built from. Surfaced by
+  # `nixos-version --json` as "configurationRevision" -- compare across
+  # days to see whether the last auto-upgrade run actually changed anything.
+  system.configurationRevision = gitRev;
+
+  users.motd = ''
+    Welcom to Super Simple Digital Signage
+    
+    Current version: 
+    NixOS ${config.system.nixos.label}
+    Build:  ${gitShortRev}  (${gitDate})
+  '';
+  
+  # Packages installed in system profile.
+  environment.systemPackages = with pkgs; [
+	git
+	htop
+	killall
+	libcec
+	libraspberrypi
+	raspberrypi-eeprom
+	vim
+	wayvnc
+  ];
 
   # Reduce overhead of journald a little
   services.journald.extraConfig = ''
-    SystemMaxFileSize=50M
-    Storage=volatile
+    Storage=persistent
+    Compress=yes
+    SystemMaxUse=50M
+    SystemMaxFileSize=10M
+    SystemMaxFiles=5
   '';
 
   # Set time zone.
@@ -70,194 +96,14 @@
   services.getty.autologinUser = "otto";
   environment.loginShellInit = ''
     [[ "$(tty)" == /dev/tty1 ]] && WLR_LIBINPUT_NO_DEVICES=1 sway
-    '';
+  '';
 
-  # Define user accounts.
+  # Define administrator account
   users.users.dbert = {
     isNormalUser = true;
     hashedPasswordFile = config.sops.secrets.dbert-pass.path;
     extraGroups = [ "wheel" ];
   };
-  users.users.otto = {
-    isNormalUser = true;
-    createHome = true;
-    extraGroups = [ "networkmanager" "wheel" "video" "render" ];
-    openssh.authorizedKeys.keys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAwaF65IvEZtjv5zCxQlCsJ5ThymSwXocfxk3uBaDlFLZXdqVw+KFb83GNwj1UDYsPCEz2RwXjs8XHxrIS72Npm+OKhlR/adbY6Q+Gtx+bM+PDKlHxOzNgYkIVHV0B8RHLVmTMjLwwOXayiolR8WuljvLjLcvRLkx1WgQgwdCuvQvCV99Gfyn9uUH7wcfdPd/SlRqPJ6k6h0J1Z/E+FlBJADxNObwlXpyhAVhlKdepT9Wo62rQfDfXDXawSRjUfDVHZkBnx7c9FH1eralLF8ILjXv1zR7It7juOgW2dtvvLWL15UKClWNfK15EWq/lp0vtR1rzueL9FtoyqKP98YBvlQ== sys-automation@server"
-    ];
-    packages = with pkgs; [
-      libreoffice-still   # Libreoffice for Slides
-      imv                 # Image viewer
-      libheif             # Explicit HEIF Support
-      mpv                 # Video Support
-      wayvnc              # VNC Server
-      openssl             # To generate Certs for VNC
-      killall
-      ffmpeg
-    ];
-  };
-
-  home-manager.users.otto = { pkgs, lib, ... }: {
-    # Enable sway management, and set options
-    wayland.windowManager.sway.enable = true;
-    wayland.windowManager.sway.config = {
-      seat = { "*" = { hide_cursor = "600"; }; };
-      output = { "*" = { bg = "~/ssds/School_District_73.jpg fill"; }; };
-      startup = [
-        { command = "exec /home/otto/ssds/wrapper.sh"; always = true; }
-      ];
-    };
-    wayland.windowManager.sway.checkConfig = false; # Don't check the config, since it references files that are pulled in from Git.
-    # Import the SSDS files from Github.
-    home.file."ssds".source = "${pkgs.fetchFromGitHub {
-      owner = "Hegz";
-      repo = "SSDS";
-  rev = "3415019e2d78090c044ce450c98344216a9ae808";
-  hash = "sha256-jNJwQ5/rfg1lVtmWHFCh2zb2iq6HcHos9rlBFnX7pGw=";
-
-    }}";
-
-    home.activation = {
-      # Generate Needed Directories
-      create_directories = lib.hm.dag.entryAfter ["writeBoundary"] ''
-        $DRY_RUN_CMD mkdir -p /home/otto/.config/wayvnc/;
-        $DRY_RUN_CMD mkdir -p /home/otto/Control;
-        $DRY_RUN_CMD mkdir -p /home/otto/Presentation;
-      '';
-      # Generate the libreoffice .config files / directories, then link in the macros
-      libreofficesetup = lib.hm.dag.entryAfter ["writeBoundary"] ''
-        if [ ! -d /home/otto/.config/libreoffice/ ]; then
-          $DRY_RUN_CMD ${pkgs.libreoffice}/bin/libreoffice --terminate_after_init --headless;
-          $DRY_RUN_CMD rm -rf /home/otto/.config/libreoffice/4/user/basic/Standard;
-          $DRY_RUN_CMD ln -s /home/otto/ssds/Standard /home/otto/.config/libreoffice/4/user/basic/;
-        fi
-      '';
-      # Generate RSA key for VNC
-      # Link VNC config into place
-      generate_keys = lib.hm.dag.entryAfter ["writeBoundary"] ''
-        if [ ! -f /home/otto/.config/wayvnc/tls_key.pem ]; then
-          $DRY_RUN_CMD ${pkgs.openssl}/bin/openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout /home/otto/.config/wayvnc/tls_key.pem -out /home/otto/.config/wayvnc/tls_cert.pem -subj /CN=localhost;
-        fi
-      '';
-    };
-    systemd.user.services = {
-      wayvnc = {
-        Unit = {
-          Description = "Wayvnc screen sharing";
-          After = ["sway-session.target"];
-          StartLimitIntervalSec = 500;
-          StartLimitBurst = 5;
-        };
-        Service = {
-          ExecStart = toString ( pkgs.writeShellScript "launch_wayvnc.sh" ''
-            ${pkgs.wayvnc}/bin/wayvnc -v --config=${config.sops.secrets.wayvnc_cfg.path}
-          '');
-          Type = "exec";
-          Restart = "on-failure";
-          RestartSec = "5s";
-        };
-        Install = {
-          WantedBy = ["default.target"];
-        };
-      };
-      # Watchdog: systemd's own Restart=on-failure gives up once
-      # StartLimitBurst is exhausted within StartLimitIntervalSec, leaving
-      # wayvnc dead until something manually clears it. This also catches
-      # the case systemd can't see at all -- wayvnc alive but hung and no
-      # longer actually accepting connections.
-      wayvnc_watchdog = {
-        Unit.Description = "WayVNC reachability watchdog";
-        Service = {
-          Type = "oneshot";
-          ExecStart = toString ( pkgs.writeShellScript "wayvnc_watchdog.sh" ''
-            set -u
-            SYSTEMCTL=${pkgs.systemd}/bin/systemctl
-
-            STATE=$($SYSTEMCTL --user is-active wayvnc.service 2>/dev/null || true)
-
-            if [ "$STATE" = "failed" ]; then
-              logger -t wayvnc-watchdog "wayvnc failed, likely hit its restart limit -- clearing and restarting"
-              $SYSTEMCTL --user reset-failed wayvnc.service
-              $SYSTEMCTL --user restart wayvnc.service
-              exit 0
-            fi
-
-            if [ "$STATE" != "active" ]; then
-              logger -t wayvnc-watchdog "wayvnc is $STATE, not active -- starting"
-              $SYSTEMCTL --user start wayvnc.service
-              exit 0
-            fi
-
-            if ! timeout 3 ${pkgs.bash}/bin/bash -c 'exec 3<>/dev/tcp/127.0.0.1/5900' 2>/dev/null; then
-              logger -t wayvnc-watchdog "wayvnc reports active but port 5900 refused connection -- restarting"
-              $SYSTEMCTL --user restart wayvnc.service
-            fi
-          '');
-        };
-      };
-      # Open office has a memory leak. Refresh it daily at 6:00am
-      office_refresh = {
-        Unit.Description = "Nightly Libreoffice Refresh";
-        Service = {
-          Type = "oneshot";
-          ExecStart = toString ( pkgs.writeShellScript "soffice_refresh.sh" ''
-            ${pkgs.killall}/bin/killall soffice.bin
-            sleep 2
-            ${pkgs.findutils}/bin/find /home/otto/Presentation -maxdepth 1 -type f -name ".~lock.*.odp#" -delete
-            ${pkgs.coreutils-full}/bin/touch /home/otto/Control/End
-          '');
-        };
-      };
-    };
-    systemd.user.timers = {
-      office_refresh = {
-        Unit.Description = "Office Refresh schedule";
-        Timer = {
-          Unit = "office_refresh.service";
-          OnCalendar = "06:00";
-        };
-        Install.WantedBy = [ "timers.target" ];
-      };
-      wayvnc_watchdog = {
-        Unit.Description = "WayVNC watchdog schedule";
-        Timer = {
-          Unit = "wayvnc_watchdog.service";
-          OnBootSec = "2m";
-          OnUnitActiveSec = "2m";
-        };
-        Install.WantedBy = [ "timers.target" ];
-      };
-    };
-    home.stateVersion = "23.05";  # Required
-  };
-
-  # Packages installed in system profile.
-  environment.systemPackages = with pkgs; [
-    vim
-    git
-    libcec
-    htop
-    libraspberrypi
-    raspberrypi-eeprom
-    killall
-  ];
-
-  # CEC related configuration
-  nixpkgs.overlays = [
-    (self: super: { libcec = super.libcec.override { withLibraspberrypi = true; }; })
-  ];
-
-  services.udev.extraRules = ''
-    # allow access to raspi cec device for video group (and optionally register it as a systemd device, used below)
-    SUBSYSTEM=="vchiq", GROUP="video", MODE="0660", TAG+="systemd", ENV{SYSTEMD_ALIAS}="/dev/vchiq"
-  '';
-
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # 5900 - VNC
-  networking.firewall.allowedTCPPorts = [ 5900 ];
 
   # Flakes are required for the auto-upgrade below. Harmless if already
   # enabled elsewhere (e.g. in flake.nix's nixConfig).
@@ -268,11 +114,12 @@
   # is a guess based on your shell prompt earlier in this conversation,
   # not a confirmed fact, so verify it before relying on this.
   system.autoUpgrade = {
-    enable = true;
-    flake = "github:Hegz/SSDS-nixos#nixos-ssds";
-    dates = "04:00";
-    operation = "switch";
+	enable = true;
+	flake = "github:Hegz/SSDS-nixos#nixos-ssds";
+	dates = "04:00";
+	operation = "switch";
   };
 
   system.stateVersion = "23.05"; # Required
+
 }
