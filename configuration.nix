@@ -121,6 +121,7 @@
 	flake = "github:Hegz/SSDS-nixos#nixos-ssds";
 	dates = "04:00";
 	operation = "switch";
+    flags = [ "--refresh" ];
   };
 
   system.stateVersion = "23.05"; # Required
