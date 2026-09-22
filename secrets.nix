@@ -10,7 +10,11 @@
     mode = "0440";
   };
 
-  sops.secrets."otto-authorized-keys" = { }; # root-readable; sshd's monitor process reads it before dropping privileges
+  sops.secrets."otto-authorized-keys" = {
+     owner = "otto";
+     group = "users";
+     path = "/run/secrets/ssh-authorized-keys-otto";
+  };
 
   # Secret Management via sops-nix (Guacamole)
   sops.secrets.guac_admin_password = {

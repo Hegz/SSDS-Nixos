@@ -5,7 +5,6 @@
 	isNormalUser = true;
     createHome = true;
     extraGroups = [ "networkmanager" "wheel" "video" "render" ];
-    openssh.authorizedKeys.keys = [ config.sops.secrets."otto-authorized-keys".path ];
     packages = with pkgs; [
       ffmpeg
       imv                 # Image viewer

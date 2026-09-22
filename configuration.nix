@@ -30,6 +30,9 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+  
+  # enable access to sops protected key files.
+  services.openssh.settings.AuthorizedKeysFile = ".ssh/authorized_keys /run/secrets/ssh-authorized-keys-%u";
 
   environment.variables = {
     # Forces Mesa to scale back aggressive multi-threading
