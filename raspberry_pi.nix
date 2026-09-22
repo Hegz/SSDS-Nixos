@@ -45,9 +45,15 @@
   # "standby 0" -> power the display off
   systemd.services = {
     tv-power-on = {
-      description = "CEC: power on the TV";
+      description = "CEC: power on the TV, unless today is excluded";
       serviceConfig.Type = "oneshot";
       script = ''
+        today=$(date +%F)
+        excluded="/var/lib/tv-schedule/excluded-dates.txt"
+        if grep -qxF "$today" "$excluded" 2>/dev/null; then
+          echo "TV power-on skipped: $today is on the excluded-dates list" | ${pkgs.util-linux}/bin/logger -t tv-power
+          exit 0
+        fi
         echo "on 0" | ${pkgs.libcec}/bin/cec-client -s -d 1
       '';
     };
@@ -64,12 +70,12 @@
     tv-power-on = {
       description = "Schedule: power on the TV";
       wantedBy = [ "timers.target" ];
-      timerConfig.OnCalendar = "07:00"; # adjust to taste
+      timerConfig.OnCalendar = "Mon..Fri 07:00"; # adjust to taste
     };
     tv-power-off = {
       description = "Schedule: power off the TV";
       wantedBy = [ "timers.target" ];
-      timerConfig.OnCalendar = "18:00"; # adjust to taste
+      timerConfig.OnCalendar = "15:30"; # adjust to taste
     };
   };
 
