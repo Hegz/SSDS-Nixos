@@ -16,7 +16,7 @@
   };  
 
   # Users home folder definition
-  home-manager.users.otto = { pkgs, lib, ... }: {
+  home-manager.users.otto = { pkgs, lib, ... }: 
 	let
       maintenanceLock = "/home/otto/Control/Maintenance.lock";
 
