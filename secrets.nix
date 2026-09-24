@@ -22,7 +22,7 @@
     owner = "tomcat";
   };
 
-  sops.secrets."tv-calendar-ics-url" = { };
+  # sops.secrets."tv-calendar-ics-url" = { };
 
   # Render the user-mapping.xml securely in /run/secrets/ at boot
   sops.templates."guacamole-user-mapping.xml" = {
