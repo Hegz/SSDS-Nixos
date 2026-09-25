@@ -101,8 +101,8 @@
       home.file."ssds".source = "${pkgs.fetchFromGitHub {
         owner = "Hegz";
         repo = "SSDS";
-        rev = "3415019e2d78090c044ce450c98344216a9ae808";
-        hash = "sha256-jNJwQ5/rfg1lVtmWHFCh2zb2iq6HcHos9rlBFnX7pGw=";
+        rev = "a4613532ba1e9eddd52754a4d5668b8dc8d98775";
+        hash = "sha256-OIVMBBhdd3vOTYLeAZGwDzd8oTQLalIENfUJ6G4HFC0=";
       }}";
 
       home.activation = {
